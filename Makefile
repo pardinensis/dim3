@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -std=c++11
-LFLAGS = -lSDL2 -lGL
+LFLAGS = -lGL -lGLEW -lSDL2
 
 SRCDIR = src
 
