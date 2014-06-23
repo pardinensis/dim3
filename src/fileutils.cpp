@@ -30,6 +30,8 @@ void parse_config_file(const std::string& filename) {
 		// extract value
 		begin = line.find_first_not_of(" \f\t\v", end+1);
 		end = line.find_last_not_of(" \f\t\v") + 1;
+		if (begin == std::string::npos) continue;
+		if (end == std::string::npos) continue;		
 		value = line.substr(begin, end - begin);
 
 		// store key-value pair
@@ -54,3 +56,16 @@ T get(const std::string& key) {
 }
 template std::string get<std::string>(const std::string& key);
 template int get<int>(const std::string& key);
+template double get<double>(const std::string& key);
+
+template <typename T>
+T get(const std::string& key, T default_value) {
+	T t = default_value;
+	try {
+		t = get<T>(key);
+	} catch (...) {}
+	return t;
+}
+template std::string get<std::string>(const std::string& key, std::string default_value);
+template int get<int>(const std::string& key, int default_value);
+template double get<double>(const std::string& key, double default_value);

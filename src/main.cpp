@@ -1,56 +1,36 @@
-#include <SDL2/SDL.h>
-#include <iostream>
-#include <sstream>
-#include <stack>
-#include <functional>
-
 #include "fileutils.hpp"
+#include "renderer.hpp"
+#include "shared.hpp"
 
 
 SDL_Window* window = nullptr;
-SDL_Renderer* renderer = nullptr;
+Renderer* renderer = nullptr;
 
 bool should_quit = false;
 
 
-std::stack<std::function<void()>> clean_up_stack;
 
 void init() {
 	parse_config_file("config.txt");
 
 	// initializing SDL
-	if (SDL_Init(SDL_INIT_VIDEO)) {
-		std::stringstream ss;
-		ss << "sdl_init failed: " << SDL_GetError();
-		throw ss.str();
-	}
-	clean_up_stack.push(SDL_Quit);
+	int success = SDL_Init(SDL_INIT_VIDEO);
+	check_sdl_error(success, "SDL_Init");
+	push_cleanup_function(SDL_Quit);
 
 	// creating a window
 	window = SDL_CreateWindow(
 		get<std::string>("WINDOW_NAME").c_str(),
-		get<int>("WINDOW_POS_X"),
-		get<int>("WINDOW_POS_Y"),
+		get<int>("WINDOW_POS_X", SDL_WINDOWPOS_UNDEFINED),
+		get<int>("WINDOW_POS_Y", SDL_WINDOWPOS_UNDEFINED),
 		get<int>("WINDOW_SIZE_X"),
 		get<int>("WINDOW_SIZE_Y"),
-		SDL_WINDOW_SHOWN);
-	if (!window) {
-		std::stringstream ss;
-		ss << "sdl_create_window failed: " << SDL_GetError();
-		throw ss.str();
-	}
-	clean_up_stack.push(std::bind(SDL_DestroyWindow, window));
+		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	check_sdl_error(window, "SDL_CreateWindow");
+	push_cleanup_function(std::bind(SDL_DestroyWindow, window));
 
 	// creating the render context
-	renderer = SDL_CreateRenderer(window, -1, 
-		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (!renderer) {
-		std::stringstream ss;
-		ss << "sdl_create_renderer failed: " << SDL_GetError();
-		throw ss.str();
-	}
-	clean_up_stack.push(std::bind(SDL_DestroyRenderer, renderer));
-
+	renderer = new Renderer(window);
 }
 
 void process_events() {
@@ -66,22 +46,22 @@ void process_events() {
 }
 
 void loop() {
-	while (!should_quit) {
-		process_events();
-	}
+	process_events();
+	renderer->render();
 }
 
-void clean_up() {
-	while (!clean_up_stack.empty()) {
-		clean_up_stack.top()();
-		clean_up_stack.pop();
-	}
-}
 
 int main() {
 	try {
+		// init program
 		init();
-		loop();
+
+		// start the main loop
+		while (!should_quit) {
+			loop();
+		}
+	
+	// print out errors and quit
 	} catch (std::string str) {
 		std::cerr << "[ERROR] " << str << std::endl;
 		clean_up();
