@@ -15,14 +15,13 @@ Renderer::Renderer(SDL_Window* window) : window(window), context(nullptr), rende
 	push_cleanup_function(std::bind(SDL_DestroyRenderer, renderer));
 
 	// parse clear color
-	clear_color = glm::vec4(
+	glClearColor(
 		get<double>("RENDERER_BACKGROUND_COLOR_R", 0),
 		get<double>("RENDERER_BACKGROUND_COLOR_G", 0),
 		get<double>("RENDERER_BACKGROUND_COLOR_B", 0), 1);
 }
 
 void Renderer::render() {
-	glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	SDL_GL_SwapWindow(window);
