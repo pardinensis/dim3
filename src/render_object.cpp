@@ -7,7 +7,7 @@ std::map<std::string, RenderObject*> render_map;
 
 
 RenderObject::RenderObject(const std::string& name) :
-		n_vertices(0), n_indices(0), tex_id(0) {
+		n_vertices(0), n_indices(0), tex_id(0), shader("") {
 
 	glGenVertexArrays(1, &vao_id);
 	glBindVertexArray(vao_id);
@@ -50,6 +50,10 @@ void RenderObject::add_vertex_buffer(const std::string& name, std::vector<glm::v
 
 void RenderObject::bind_texture(const std::string& name) {
 	tex_id = texture::get(name);
+}
+
+void RenderObject::bind_shader(const std::string& name) {
+	shader = name;
 }
 
 

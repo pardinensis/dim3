@@ -67,6 +67,7 @@ void init() {
 	test->add_vertex_buffer("pos", pos, 0);
 	test->add_vertex_buffer("tc", tc, 1);
 	test->bind_texture("orange");
+	test->bind_shader("test");
 	renderer->register_render_object("test");
 
 

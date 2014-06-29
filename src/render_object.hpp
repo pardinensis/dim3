@@ -17,6 +17,7 @@ public:
 	unsigned int n_vertices;
 	unsigned int n_indices;
 	GLuint tex_id;
+	std::string shader;
 
 
 public:
@@ -31,7 +32,7 @@ public:
 	void add_vertex_buffer(const std::string& name, std::vector<glm::vec4>& v, unsigned int layout_pos);
 
 	void bind_texture(const std::string& name);
-
+	void bind_shader(const std::string& name);
 };
 
 RenderObject* create_render_object(const std::string& name);

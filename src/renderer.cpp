@@ -45,13 +45,13 @@ void Renderer::deregister_render_object(const std::string& name) {
 
 void Renderer::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	shader::use("test");
 	for (auto pair : renderables) {
 		RenderObject* obj = pair.second;
 		glBindVertexArray(obj->vao_id);
 		
 		if (obj->tex_id) glBindTexture(GL_TEXTURE_2D, obj->tex_id);
 		
+		shader::use(obj->shader);
 		glDrawArrays(GL_TRIANGLES, 0, obj->n_vertices);
 		
 		if (obj->tex_id) glBindTexture(GL_TEXTURE_2D, 0);
