@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++11
+CFLAGS = -std=c++11 -Wall -Werror
 LFLAGS = -lGL -lGLEW -lSDL2 -lSDL2_image
 
 SRCDIR = src

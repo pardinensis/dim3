@@ -1,6 +1,7 @@
-#include "fileutils.hpp"
+#include "file_utils.hpp"
 #include "renderer.hpp"
 #include "texture.hpp"
+#include "shader.hpp"
 #include "common.hpp"
 
 
@@ -33,11 +34,31 @@ void init() {
 	check_sdl_error(window, "SDL_CreateWindow");
 	push_cleanup_function(std::bind(SDL_DestroyWindow, window));
 
+	// initializing GL context
+	SDL_GLContext gl_context = SDL_GL_CreateContext(window);
+	push_cleanup_function(std::bind(SDL_GL_DeleteContext, gl_context));
+
+	// initialiing GLEW
+	glewExperimental = GL_TRUE;
+	glewInit();
+
 	// creating the render context
 	renderer = new Renderer(window);
+	texture::create("orange", "media/dev.jpg", renderer->sdl_renderer);
 
-	// initializing SDL_image
-	texture::init();
+	// create shader
+	shader::create("test", "shader/vs.glsl", GL_VERTEX_SHADER);
+	shader::create("test", "shader/fs.glsl", GL_FRAGMENT_SHADER);
+
+	// test triangle
+	RenderObject* test = create_render_object("test");
+	std::vector<glm::vec3> pos = {
+		glm::vec3(0.5, 0.5, 0),
+		glm::vec3(-0.5, 0.5, 0),
+		glm::vec3(0, -0.5, 0)
+	};
+	test->add_vertex_buffer("pos", pos, 0);
+	renderer->register_render_object("test");
 
 
 	// make the window visible
