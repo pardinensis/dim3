@@ -2,13 +2,15 @@
 
 #include "common.hpp"
 
+#include <GL/gl.h>
+
 
 namespace texture {
 	void init();
 
-	void create(const std::string& name, const std::string& filename, SDL_Renderer* renderer);
+	void create(const std::string& name, const std::string& filename);
 	void remove(const std::string& name);
 	void remove_all();
 
-	SDL_Texture* get(const std::string& name);
+	GLuint get(const std::string& name);
 }

@@ -49,6 +49,10 @@ void Renderer::render() {
 	for (auto pair : renderables) {
 		RenderObject* obj = pair.second;
 		glBindVertexArray(obj->vao_id);
+		if (obj->tex_id) {
+			std::cout << obj->tex_id << std::endl;
+			glBindTexture(GL_TEXTURE_2D, obj->tex_id);
+		}
 		glDrawArrays(GL_TRIANGLES, 0, obj->n_vertices);
 	}
 

@@ -16,6 +16,7 @@ public:
 	GLuint vao_id;
 	unsigned int n_vertices;
 	unsigned int n_indices;
+	GLuint tex_id;
 
 
 public:
@@ -28,6 +29,8 @@ public:
 	void add_vertex_buffer(const std::string& name, std::vector<glm::vec2>& v, unsigned int layout_pos);
 	void add_vertex_buffer(const std::string& name, std::vector<glm::vec3>& v, unsigned int layout_pos);
 	void add_vertex_buffer(const std::string& name, std::vector<glm::vec4>& v, unsigned int layout_pos);
+
+	void bind_texture(const std::string& name);
 
 };
 

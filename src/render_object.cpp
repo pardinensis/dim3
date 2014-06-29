@@ -1,12 +1,13 @@
 #include "render_object.hpp"
 
 #include "gl_utils.hpp"
+#include "texture.hpp"
 
 std::map<std::string, RenderObject*> render_map;
 
 
 RenderObject::RenderObject(const std::string& name) :
-		n_vertices(0), n_indices(0) {
+		n_vertices(0), n_indices(0), tex_id(0) {
 
 	glGenVertexArrays(1, &vao_id);
 	glBindVertexArray(vao_id);
@@ -45,6 +46,12 @@ void RenderObject::add_vertex_buffer(const std::string& name, std::vector<glm::v
 		unsigned int layout_pos) {
 	add_vertex_buffer(name, GL_FLOAT, v.size(), 4, &v[0], layout_pos);
 }
+
+
+void RenderObject::bind_texture(const std::string& name) {
+	tex_id = texture::get(name);
+}
+
 
 RenderObject::~RenderObject() {
 	for (auto pair : vbufs) {

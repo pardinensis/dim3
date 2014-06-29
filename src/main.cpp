@@ -38,17 +38,19 @@ void init() {
 	SDL_GLContext gl_context = SDL_GL_CreateContext(window);
 	push_cleanup_function(std::bind(SDL_GL_DeleteContext, gl_context));
 
-	// initialiing GLEW
+	// initializing GLEW
 	glewExperimental = GL_TRUE;
 	glewInit();
 
 	// creating the render context
 	renderer = new Renderer(window);
-	texture::create("orange", "media/dev.jpg", renderer->sdl_renderer);
 
 	// create shader
 	shader::create("test", "shader/vs.glsl", GL_VERTEX_SHADER);
 	shader::create("test", "shader/fs.glsl", GL_FRAGMENT_SHADER);
+
+	// create texture
+	texture::create("orange", "media/dev.jpg");
 
 	// test triangle
 	RenderObject* test = create_render_object("test");
@@ -57,7 +59,14 @@ void init() {
 		glm::vec3(-0.5, 0.5, 0),
 		glm::vec3(0, -0.5, 0)
 	};
+	std::vector<glm::vec2> tc = {
+		glm::vec2(2, 2),
+		glm::vec2(-1, 2),
+		glm::vec2(0.5, -1)
+	};
 	test->add_vertex_buffer("pos", pos, 0);
+	test->add_vertex_buffer("tc", tc, 1);
+	test->bind_texture("orange");
 	renderer->register_render_object("test");
 
 
