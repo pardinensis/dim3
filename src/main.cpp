@@ -61,8 +61,8 @@ void init() {
 	};
 	std::vector<glm::vec2> tc = {
 		glm::vec2(2, 2),
-		glm::vec2(-1, 2),
-		glm::vec2(0.5, -1)
+		glm::vec2(0, 2),
+		glm::vec2(1, 0)
 	};
 	test->add_vertex_buffer("pos", pos, 0);
 	test->add_vertex_buffer("tc", tc, 1);
