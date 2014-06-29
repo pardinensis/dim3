@@ -52,22 +52,29 @@ void init() {
 	// create texture
 	texture::create("orange", "media/dev.jpg");
 
-	// test triangle
+	// test quad
 	RenderObject* test = create_render_object("test");
 	std::vector<glm::vec3> pos = {
-		glm::vec3(0.5, 0.5, 0),
-		glm::vec3(-0.5, 0.5, 0),
-		glm::vec3(0, -0.5, 0)
+		glm::vec3(-.5,  .5, 0),
+		glm::vec3( .5,  .5, 0),
+		glm::vec3(-.5, -.5, 0),
+		glm::vec3( .5, -.5, 0)
 	};
 	std::vector<glm::vec2> tc = {
-		glm::vec2(2, 2),
-		glm::vec2(0, 2),
-		glm::vec2(1, 0)
+		glm::vec2(0, 0),
+		glm::vec2(1, 0),
+		glm::vec2(0, 1),
+		glm::vec2(1, 1)
+	};
+	std::vector<glm::uvec3> idx = {
+		glm::uvec3(0, 2, 1),
+		glm::uvec3(2, 3, 1)
 	};
 	test->add_vertex_buffer("pos", pos, 0);
 	test->add_vertex_buffer("tc", tc, 1);
-	test->bind_texture("orange");
-	test->bind_shader("test");
+	test->add_index_buffer(idx);
+	test->set_texture("orange");
+	test->set_shader("test");
 	renderer->register_render_object("test");
 
 

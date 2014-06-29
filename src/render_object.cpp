@@ -2,12 +2,13 @@
 
 #include "gl_utils.hpp"
 #include "texture.hpp"
+#include "shader.hpp"
 
 std::map<std::string, RenderObject*> render_map;
 
 
 RenderObject::RenderObject(const std::string& name) :
-		n_vertices(0), n_indices(0), tex_id(0), shader("") {
+		ibuf_id(0), n_vertices(0), n_indices(0), tex_id(0), shader_name("") {
 
 	glGenVertexArrays(1, &vao_id);
 	glBindVertexArray(vao_id);
@@ -18,7 +19,14 @@ void RenderObject::add_vertex_buffer(const std::string& name, GLenum content_typ
 		unsigned int n_vertices, unsigned int dim, const void* data, unsigned int layout_pos) {
 	glBindVertexArray(vao_id);
 
-	this->n_vertices = n_vertices;
+	if (this->n_vertices == 0) {
+		this->n_vertices = n_vertices;
+	} else if (this->n_vertices != n_vertices) {
+		std::stringstream ss;
+		ss << "add_vertex_buffer failed: wrong number of vertices, got ";
+		ss << n_vertices << ", expected " << this->n_vertices;
+		throw ss.str();
+	}
 
 	GLuint buf_id;
 	glGenBuffers(1, &buf_id);
@@ -48,12 +56,63 @@ void RenderObject::add_vertex_buffer(const std::string& name, std::vector<glm::v
 }
 
 
-void RenderObject::bind_texture(const std::string& name) {
+void RenderObject::add_index_buffer(std::vector<unsigned int>& v) {
+	n_indices = v.size();
+
+	glBindVertexArray(vao_id);
+
+	glGenBuffers(1, &ibuf_id);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuf_id);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * n_indices,
+		&v[0], GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
+}
+
+void RenderObject::add_index_buffer(std::vector<glm::uvec3>& v) {
+	n_indices = 3 * v.size();
+
+	glBindVertexArray(vao_id);
+	
+	glGenBuffers(1, &ibuf_id);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibuf_id);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * n_indices,
+		&v[0], GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
+}
+
+
+void RenderObject::render() {
+	// bind vao
+	glBindVertexArray(vao_id);
+		
+	// bind texture
+	glBindTexture(GL_TEXTURE_2D, tex_id);
+	
+	// bind shader
+	shader::use(shader_name);
+	
+	// draw stuff
+	if (ibuf_id) {
+		glDrawElements(GL_TRIANGLES, n_indices, GL_UNSIGNED_INT, 0);
+	} else {
+		glDrawArrays(GL_TRIANGLES, 0, n_vertices);
+	}
+		
+	// unbind everything
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void RenderObject::set_texture(const std::string& name) {
 	tex_id = texture::get(name);
 }
 
-void RenderObject::bind_shader(const std::string& name) {
-	shader = name;
+void RenderObject::set_shader(const std::string& name) {
+	shader_name = name;
 }
 
 

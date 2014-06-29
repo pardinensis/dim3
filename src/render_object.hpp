@@ -12,12 +12,12 @@ private:
 	// name -> (vbo_id, layout_pos)
 	std::map<std::string, std::pair<GLuint, unsigned int>> vbufs;
 
-public:
 	GLuint vao_id;
+	GLuint ibuf_id;
 	unsigned int n_vertices;
 	unsigned int n_indices;
 	GLuint tex_id;
-	std::string shader;
+	std::string shader_name;
 
 
 public:
@@ -31,8 +31,13 @@ public:
 	void add_vertex_buffer(const std::string& name, std::vector<glm::vec3>& v, unsigned int layout_pos);
 	void add_vertex_buffer(const std::string& name, std::vector<glm::vec4>& v, unsigned int layout_pos);
 
-	void bind_texture(const std::string& name);
-	void bind_shader(const std::string& name);
+	void add_index_buffer(std::vector<unsigned int>& i);
+	void add_index_buffer(std::vector<glm::uvec3>& i);
+
+	void render();
+
+	void set_texture(const std::string& name);
+	void set_shader(const std::string& name);
 };
 
 RenderObject* create_render_object(const std::string& name);
