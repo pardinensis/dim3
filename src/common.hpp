@@ -3,7 +3,7 @@
 #define GL_GLEXT_PROTOTYPES 1
 #include <SDL2/SDL.h>
 
-
+#define GLM_FORCE_RADIANS 1
 #include <glm/glm.hpp>
 
 

@@ -128,3 +128,7 @@ GLuint shader::use(const std::string& name) {
 
 	return p.id;
 }
+
+GLuint shader::uniform(GLuint program_id, const std::string& name) {
+	return glGetUniformLocation(program_id, name.c_str());
+}

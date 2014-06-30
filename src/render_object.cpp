@@ -85,7 +85,7 @@ void RenderObject::add_index_buffer(std::vector<glm::uvec3>& v) {
 }
 
 
-void RenderObject::render() {
+void RenderObject::render(Camera* cam) {
 	// bind vao
 	glBindVertexArray(vao_id);
 		
@@ -93,7 +93,13 @@ void RenderObject::render() {
 	glBindTexture(GL_TEXTURE_2D, tex_id);
 	
 	// bind shader
-	shader::use(shader_name);
+	GLuint program_id = shader::use(shader_name);
+
+	// upload camera matrices
+	GLuint view_loc = shader::uniform(program_id, "view_matrix");
+	GLuint proj_loc = shader::uniform(program_id, "proj_matrix");
+	cam->upload_matrices(view_loc, proj_loc);
+
 	
 	// draw stuff
 	if (ibuf_id) {

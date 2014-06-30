@@ -23,6 +23,9 @@ Renderer::Renderer(SDL_Window* window) : window(window), context(nullptr), sdl_r
 	// initializing SDL_image
 	texture::init();
 
+	// gl settings
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 
 
 	// parse clear color
@@ -42,12 +45,19 @@ void Renderer::deregister_render_object(const std::string& name) {
 }
 
 
+void Renderer::set_camera(const std::string& name) {
+	camera = name;
+}
+
+
 
 void Renderer::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+	Camera* cam = Camera::get(camera);
+
 	for (auto pair : renderables) {
-		pair.second->render();
+		pair.second->render(cam);
 	}
 
 	SDL_GL_SwapWindow(window);

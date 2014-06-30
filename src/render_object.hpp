@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 #include "common.hpp"
+#include "camera.hpp"
 
 #include <GL/glew.h>
 
@@ -17,8 +18,9 @@ private:
 	unsigned int n_vertices;
 	unsigned int n_indices;
 	GLuint tex_id;
-	std::string shader_name;
 
+	std::string shader_name;
+	glm::mat4 model_matrix;
 
 public:
 	RenderObject(const std::string& name);
@@ -34,7 +36,7 @@ public:
 	void add_index_buffer(std::vector<unsigned int>& i);
 	void add_index_buffer(std::vector<glm::uvec3>& i);
 
-	void render();
+	void render(Camera* cam);
 
 	void set_texture(const std::string& name);
 	void set_shader(const std::string& name);

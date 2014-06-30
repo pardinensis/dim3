@@ -9,4 +9,6 @@ namespace shader {
 	void remove_all();
 
 	GLuint use(const std::string& name);
+
+	GLuint uniform(GLuint program_id, const std::string& name);
 }
