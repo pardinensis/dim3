@@ -1,7 +1,7 @@
 #include "file_utils.hpp"
 #include "renderer.hpp"
 #include "texture.hpp"
-#include "shader.hpp"
+#include "phong_material.hpp"
 #include "common.hpp"
 
 
@@ -55,11 +55,15 @@ void init() {
 	renderer->set_camera("cam");
 
 	// create shader
-	shader::create("test", "shader/vs.glsl", GL_VERTEX_SHADER);
-	shader::create("test", "shader/fs.glsl", GL_FRAGMENT_SHADER);
+	//shader::create("test", "shader/vs.glsl", GL_VERTEX_SHADER);
+	//shader::create("test", "shader/fs.glsl", GL_FRAGMENT_SHADER);
 
 	// create texture
-	texture::create("orange", "media/dev.jpg");
+	//texture::create("orange", "media/dev.jpg");
+
+	Material* blue = new PhongMaterial(glm::vec3(0, 0, 0.2), glm::vec3(0.2, 0.2, 1),
+			glm::vec3(1, 1, 1), 5);
+	add_material("blue", blue);
 
 	// test cube
 	RenderObject* test = create_render_object("test");
@@ -107,13 +111,12 @@ void init() {
 		glm::uvec3(2, 3, 6), //bottom
 		glm::uvec3(6, 3, 7)
 	};
-	test->add_vertex_buffer("pos", pos, 0);
-	test->add_vertex_buffer("tc", tc, 1);
-	test->add_vertex_buffer("col", col, 2);
+	test->add_vertex_buffer(RenderObject::BufferType::POS, pos, 0);
+	//test->add_vertex_buffer(RenderObject::BufferType::TC, tc, 1);
+	//test->add_vertex_buffer(RenderObject::BufferType::COLOR, col, 2);
 	test->add_index_buffer(idx);
-	test->set_texture("orange");
-	test->set_shader("test");
-	renderer->register_render_object("test");
+	test->set_material("blue");
+	renderer->register_render_object(test);
 
 
 	// make the window visible

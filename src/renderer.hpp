@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 #include "render_object.hpp"
+#include "material.hpp"
 #include "camera.hpp"
 #include <glm/vec4.hpp>
 
@@ -19,8 +20,11 @@ public:
 public:
 	Renderer(SDL_Window* window);
 
-	void register_render_object(const std::string& name);
-	void deregister_render_object(const std::string& name);
+	void register_render_object(RenderObject* obj);
+	void deregister_render_object(RenderObject* obj);
+
+	void register_material(Material* mat);
+	void deregister_material(Material* mat);
 
 	void set_camera(const std::string& name);
 

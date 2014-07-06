@@ -7,7 +7,7 @@
 #include "texture.hpp"
 
 
-std::map<std::string, RenderObject*> renderables;
+std::map<std::string, std::vector<RenderObject*>> renderables;
 
 Renderer::Renderer(SDL_Window* window) : window(window), context(nullptr), sdl_renderer(nullptr) {
 	// init opengl context
@@ -36,12 +36,21 @@ Renderer::Renderer(SDL_Window* window) : window(window), context(nullptr), sdl_r
 }
 
 
-void Renderer::register_render_object(const std::string& name) {
-	renderables.emplace(name, get_render_object(name));
+void Renderer::register_render_object(RenderObject* obj) {
+	auto it = renderables.find(obj->get_material());
+	if (it == renderables.end()) {
+		it = renderables.emplace(obj->get_material(), std::vector<RenderObject*>()).first;
+	}
+	it->second.push_back(obj);
 }
 
-void Renderer::deregister_render_object(const std::string& name) {
-	renderables.erase(name);
+void Renderer::deregister_render_object(RenderObject* obj) {
+	auto& vec = renderables.find(obj->get_material())->second;
+	for (auto it2 = vec.begin(); it2 != vec.end(); ++it2) {
+		if (*it2 == obj) {
+			vec.erase(it2);
+		}
+	}
 }
 
 
@@ -55,9 +64,22 @@ void Renderer::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	Camera* cam = Camera::get(camera);
-
+	
 	for (auto pair : renderables) {
-		pair.second->render(cam);
+		// bind material
+		Material* mat = get_material(pair.first);
+		mat->bind();
+
+		// pass camera matrices
+		GLuint program_id = mat->get_program_id();
+		GLuint view_loc = shader::uniform(program_id, "view_matrix");
+		GLuint proj_loc = shader::uniform(program_id, "proj_matrix");
+		cam->upload_matrices(view_loc, proj_loc);
+
+		// draw all objects with this material		
+		for (RenderObject* obj : pair.second) {
+			obj->draw();
+		}
 	}
 
 	SDL_GL_SwapWindow(window);

@@ -8,14 +8,14 @@ std::map<std::string, RenderObject*> render_map;
 
 
 RenderObject::RenderObject(const std::string& name) :
-		ibuf_id(0), n_vertices(0), n_indices(0), tex_id(0), shader_name("") {
+		ibuf_id(0), n_vertices(0), n_indices(0), material_name("NULL") {
 
 	glGenVertexArrays(1, &vao_id);
 	glBindVertexArray(vao_id);
 }
 
 
-void RenderObject::add_vertex_buffer(const std::string& name, GLenum content_type, 
+void RenderObject::add_vertex_buffer(BufferType type, GLenum content_type, 
 		unsigned int n_vertices, unsigned int dim, const void* data, unsigned int layout_pos) {
 	glBindVertexArray(vao_id);
 
@@ -30,7 +30,7 @@ void RenderObject::add_vertex_buffer(const std::string& name, GLenum content_typ
 
 	GLuint buf_id;
 	glGenBuffers(1, &buf_id);
-	vbufs.emplace(name, std::make_pair(buf_id, layout_pos));
+	vbufs[type] = std::make_pair(buf_id, layout_pos);
 
 	unsigned int size_in_bytes = size_of_gl_type(content_type) * dim * n_vertices;
 
@@ -42,17 +42,17 @@ void RenderObject::add_vertex_buffer(const std::string& name, GLenum content_typ
 
 	glBindVertexArray(0);
 }
-void RenderObject::add_vertex_buffer(const std::string& name, std::vector<glm::vec2>& v, 
+void RenderObject::add_vertex_buffer(BufferType type, std::vector<glm::vec2>& v, 
 		unsigned int layout_pos) {
-	add_vertex_buffer(name, GL_FLOAT, v.size(), 2, &v[0], layout_pos);
+	add_vertex_buffer(type, GL_FLOAT, v.size(), 2, &v[0], layout_pos);
 }
-void RenderObject::add_vertex_buffer(const std::string& name, std::vector<glm::vec3>& v,
+void RenderObject::add_vertex_buffer(BufferType type, std::vector<glm::vec3>& v,
 		unsigned int layout_pos) {
-	add_vertex_buffer(name, GL_FLOAT, v.size(), 3, &v[0], layout_pos);
+	add_vertex_buffer(type, GL_FLOAT, v.size(), 3, &v[0], layout_pos);
 }
-void RenderObject::add_vertex_buffer(const std::string& name, std::vector<glm::vec4>& v,
+void RenderObject::add_vertex_buffer(BufferType type, std::vector<glm::vec4>& v,
 		unsigned int layout_pos) {
-	add_vertex_buffer(name, GL_FLOAT, v.size(), 4, &v[0], layout_pos);
+	add_vertex_buffer(type, GL_FLOAT, v.size(), 4, &v[0], layout_pos);
 }
 
 
@@ -85,21 +85,9 @@ void RenderObject::add_index_buffer(std::vector<glm::uvec3>& v) {
 }
 
 
-void RenderObject::render(Camera* cam) {
+void RenderObject::draw() {
 	// bind vao
 	glBindVertexArray(vao_id);
-		
-	// bind texture
-	glBindTexture(GL_TEXTURE_2D, tex_id);
-	
-	// bind shader
-	GLuint program_id = shader::use(shader_name);
-
-	// upload camera matrices
-	GLuint view_loc = shader::uniform(program_id, "view_matrix");
-	GLuint proj_loc = shader::uniform(program_id, "proj_matrix");
-	cam->upload_matrices(view_loc, proj_loc);
-
 	
 	// draw stuff
 	if (ibuf_id) {
@@ -110,21 +98,20 @@ void RenderObject::render(Camera* cam) {
 		
 	// unbind everything
 	glBindVertexArray(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void RenderObject::set_texture(const std::string& name) {
-	tex_id = texture::get(name);
+void RenderObject::set_material(const std::string& name) {
+	material_name = name;
 }
 
-void RenderObject::set_shader(const std::string& name) {
-	shader_name = name;
+const std::string& RenderObject::get_material() {
+	return material_name;
 }
 
 
 RenderObject::~RenderObject() {
-	for (auto pair : vbufs) {
-		glDeleteBuffers(1, &pair.second.first);
+	for (auto vbo_lpos : vbufs) {
+		glDeleteBuffers(1, &vbo_lpos.first);
 	}
 	glDeleteVertexArrays(1, &vao_id);
 }

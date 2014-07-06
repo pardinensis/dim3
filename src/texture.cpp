@@ -21,6 +21,10 @@ void texture::init() {
 }
 
 void texture::create(const std::string& name, const std::string& filename) {
+	if (texmap.find(name) != texmap.end()) {
+		return;
+	}
+	
 	SDL_Surface* img = IMG_Load(filename.c_str());
 	check_sdl_error(img, std::string("IMG_Load(") + filename);
 
