@@ -10,6 +10,8 @@ std::map<std::string, RenderObject*> render_map;
 RenderObject::RenderObject(const std::string& name) :
 		ibuf_id(0), n_vertices(0), n_indices(0), material_name("NULL") {
 
+	model_matrix = glm::mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
 	glGenVertexArrays(1, &vao_id);
 	glBindVertexArray(vao_id);
 }
@@ -42,21 +44,27 @@ void RenderObject::add_vertex_buffer(BufferType type, GLenum content_type,
 
 	glBindVertexArray(0);
 }
-void RenderObject::add_vertex_buffer(BufferType type, std::vector<glm::vec2>& v, 
+
+void RenderObject::add_vertex_buffer(BufferType type, const std::vector<glm::vec2>& v, 
 		unsigned int layout_pos) {
 	add_vertex_buffer(type, GL_FLOAT, v.size(), 2, &v[0], layout_pos);
 }
-void RenderObject::add_vertex_buffer(BufferType type, std::vector<glm::vec3>& v,
+
+void RenderObject::add_vertex_buffer(BufferType type, const std::vector<glm::vec3>& v,
 		unsigned int layout_pos) {
 	add_vertex_buffer(type, GL_FLOAT, v.size(), 3, &v[0], layout_pos);
+	if (type == BufferType::POS) {
+		create_bounding_box(v);
+	}
 }
-void RenderObject::add_vertex_buffer(BufferType type, std::vector<glm::vec4>& v,
+
+void RenderObject::add_vertex_buffer(BufferType type, const std::vector<glm::vec4>& v,
 		unsigned int layout_pos) {
 	add_vertex_buffer(type, GL_FLOAT, v.size(), 4, &v[0], layout_pos);
 }
 
 
-void RenderObject::add_index_buffer(std::vector<unsigned int>& v) {
+void RenderObject::add_index_buffer(const std::vector<unsigned int>& v) {
 	n_indices = v.size();
 
 	glBindVertexArray(vao_id);
@@ -70,7 +78,7 @@ void RenderObject::add_index_buffer(std::vector<unsigned int>& v) {
 	glBindVertexArray(0);
 }
 
-void RenderObject::add_index_buffer(std::vector<glm::uvec3>& v) {
+void RenderObject::add_index_buffer(const std::vector<glm::uvec3>& v) {
 	n_indices = 3 * v.size();
 
 	glBindVertexArray(vao_id);
@@ -82,6 +90,34 @@ void RenderObject::add_index_buffer(std::vector<glm::uvec3>& v) {
 		&v[0], GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
+}
+
+void RenderObject::create_bounding_box(const std::vector<glm::vec3>& vs) {
+	assert(vs.size() > 0);
+	aabb_min = vs[0];
+	aabb_max = vs[0];
+	for (glm::vec3 v : vs) {
+		if (v.x < aabb_min.x)
+			aabb_min.x = v.x;
+		if (v.x > aabb_max.x) 
+			aabb_max.x = v.x;
+		if (v.y < aabb_min.y)
+			aabb_min.y = v.y;
+		if (v.y > aabb_max.y) 
+			aabb_max.y = v.y;
+		if (v.z < aabb_min.z)
+			aabb_min.z = v.z;
+		if (v.z > aabb_max.z) 
+			aabb_max.z = v.z;
+	}
+}
+
+std::pair<glm::vec3, glm::vec3> RenderObject::get_bounding_box() {
+	return std::make_pair(aabb_min, aabb_max);
+}
+
+void RenderObject::get_model(glm::mat4& model) {
+	model = model_matrix;
 }
 
 

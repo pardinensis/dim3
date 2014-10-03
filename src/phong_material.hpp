@@ -3,17 +3,14 @@
 
 #include "common.hpp"
 
-#include <GL/glew.h>
-
 class PhongMaterial : public Material {
 private:
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
+	glm::vec3 color;
+	float reflectivity;
 	float shininess;
 
 public:
-	PhongMaterial(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float shininess);
+	PhongMaterial(glm::vec3 color, float reflectivity, float shininess);
 
 	virtual void bind();
 };

@@ -4,6 +4,7 @@
 #include <map>
 #include "file_utils.hpp"
 #include "shader.hpp"
+#include "light.hpp"
 #include "texture.hpp"
 
 
@@ -70,14 +71,26 @@ void Renderer::render() {
 		Material* mat = get_material(pair.first);
 		mat->bind();
 
-		// pass camera matrices
+		// get shader locations
 		GLuint program_id = mat->get_program_id();
+		GLuint model_loc = shader::uniform(program_id, "model_matrix");
+		GLuint normal_loc = shader::uniform(program_id, "normal_matrix");
 		GLuint view_loc = shader::uniform(program_id, "view_matrix");
 		GLuint proj_loc = shader::uniform(program_id, "proj_matrix");
-		cam->upload_matrices(view_loc, proj_loc);
+
+		// pass camera matrices
+		cam->upload_camera_matrices(view_loc, proj_loc);
+
+		// pass light information
+		bind_lights_to_shader(program_id);
 
 		// draw all objects with this material		
 		for (RenderObject* obj : pair.second) {
+			// pass camera matrices
+			glm::mat4 model;
+			obj->get_model(model);
+			cam->upload_object_matrices(model, model_loc, normal_loc);
+
 			obj->draw();
 		}
 	}

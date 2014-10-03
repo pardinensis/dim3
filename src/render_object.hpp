@@ -7,8 +7,6 @@
 #include "common.hpp"
 #include "camera.hpp"
 
-#include <GL/glew.h>
-
 class RenderObject {
 public:
 	enum BufferType {
@@ -24,22 +22,33 @@ private:
 	unsigned int n_vertices;
 	unsigned int n_indices;
 
+	glm::vec3 aabb_min;
+	glm::vec3 aabb_max;
+
 	std::string material_name;
+
 	glm::mat4 model_matrix;
+
+private:
+	void add_vertex_buffer(BufferType type, GLenum content_type, 
+		unsigned int n_vertices, unsigned int dim, const void* data, unsigned int layout_pos);
+
+	void create_bounding_box(const std::vector<glm::vec3>& v);
 
 public:
 	RenderObject(const std::string& name);
 	~RenderObject();
 
+	void add_vertex_buffer(BufferType type, const std::vector<glm::vec2>& v, unsigned int layout_pos);
+	void add_vertex_buffer(BufferType type, const std::vector<glm::vec3>& v, unsigned int layout_pos);
+	void add_vertex_buffer(BufferType type, const std::vector<glm::vec4>& v, unsigned int layout_pos);
 
-	void add_vertex_buffer(BufferType type, GLenum content_type, 
-		unsigned int n_vertices, unsigned int dim, const void* data, unsigned int layout_pos);
-	void add_vertex_buffer(BufferType type, std::vector<glm::vec2>& v, unsigned int layout_pos);
-	void add_vertex_buffer(BufferType type, std::vector<glm::vec3>& v, unsigned int layout_pos);
-	void add_vertex_buffer(BufferType type, std::vector<glm::vec4>& v, unsigned int layout_pos);
+	void add_index_buffer(const std::vector<unsigned int>& i);
+	void add_index_buffer(const std::vector<glm::uvec3>& i);
 
-	void add_index_buffer(std::vector<unsigned int>& i);
-	void add_index_buffer(std::vector<glm::uvec3>& i);
+	std::pair<glm::vec3, glm::vec3> get_bounding_box();
+
+	void get_model(glm::mat4& model);
 
 	void draw();
 

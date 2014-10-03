@@ -8,11 +8,12 @@ EXE = dim3
 
 
 SOURCES = $(wildcard $(SRCDIR)/*.cpp)
+HEADERS = $(wildcard $(SRCDIR)/*.hpp)
 
 all: $(EXE)
 
 clean:
 	rm -f $(EXE)
 
-dim3: $(SOURCES)
+dim3: $(SOURCES) $(HEADERS)
 	$(CC) $(CFLAGS) $(SOURCES) $(LFLAGS) -o $(EXE)

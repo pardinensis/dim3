@@ -17,3 +17,58 @@ unsigned int size_of_gl_type(GLenum type) {
 			throw ss.str();
 	}
 }
+
+void create_cube_vertex_buffer(std::vector<glm::vec3>& v) {
+	v = {
+		glm::vec3(-1,  1, -1),
+		glm::vec3( 1,  1, -1),
+		glm::vec3(-1, -1, -1),
+		glm::vec3( 1, -1, -1),
+		glm::vec3(-1,  1,  1),
+		glm::vec3( 1,  1,  1),
+		glm::vec3(-1, -1,  1),
+		glm::vec3( 1, -1,  1)
+	};
+}
+
+void create_cube_index_buffer(std::vector<glm::uvec3>& v) {
+	v = {
+		glm::uvec3(0, 1, 2), //front
+		glm::uvec3(2, 1, 3),
+		glm::uvec3(5, 4, 7), //back
+		glm::uvec3(7, 4, 6),
+		glm::uvec3(1, 5, 3), //right
+		glm::uvec3(3, 5, 7),
+		glm::uvec3(4, 0, 6), //left
+		glm::uvec3(6, 0, 2),
+		glm::uvec3(4, 5, 0), //top
+		glm::uvec3(0, 5, 1),
+		glm::uvec3(2, 3, 6), //bottom
+		glm::uvec3(6, 3, 7)
+	};
+}
+
+void calculate_face_normals(const std::vector<glm::vec3>& verts, const std::vector<glm::uvec3>& tris,
+					   std::vector<glm::vec3>& normals) {
+	normals.clear();
+	for (glm::uvec3 t : tris) {
+		normals.push_back(glm::normalize(glm::cross(verts[t.y] - verts[t.x], verts[t.z] - verts[t.x])));
+	}
+}
+
+void calculate_vertex_normals(const std::vector<glm::vec3>& verts, const std::vector<glm::uvec3>& tris,
+					   std::vector<glm::vec3>& normals) {
+	normals.clear();
+	for (unsigned int i = 0; i < verts.size(); ++i) {
+		normals.push_back(glm::vec3(0, 0, 0));
+	}
+	for (glm::uvec3 t : tris) {
+		glm::vec3 n = glm::cross(verts[t.y] - verts[t.x], verts[t.z] - verts[t.x]);
+		normals[t.x] += n;
+		normals[t.y] += n;
+		normals[t.z] += n;
+	}
+	for (unsigned int i = 0; i < verts.size(); ++i) {
+		normals[i] = glm::normalize(normals[i]);
+	}
+}

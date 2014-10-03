@@ -2,8 +2,8 @@
 #include "shader.hpp"
 
 
-PhongMaterial::PhongMaterial(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float shininess) :
-		ambient(ambient), diffuse(diffuse), specular(specular), shininess(shininess) {
+PhongMaterial::PhongMaterial(glm::vec3 color, float reflectivity, float shininess) :
+		color(color), reflectivity(reflectivity), shininess(shininess) {
 
 	static bool initialized = false;
 	if (!initialized) {
@@ -15,8 +15,7 @@ PhongMaterial::PhongMaterial(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 spe
 
 void PhongMaterial::bind() {
 	program_id = shader::use("phong");
-	glUniform3f(shader::uniform(program_id, "ambient"), ambient.x, ambient.y, ambient.z);
-	glUniform3f(shader::uniform(program_id, "diffuse"), diffuse.x, diffuse.y, diffuse.z);
-	glUniform3f(shader::uniform(program_id, "specular"), specular.x, specular.y, specular.z);
+	glUniform3f(shader::uniform(program_id, "color"), color.x, color.y, color.z);
+	glUniform1f(shader::uniform(program_id, "reflectivity"), reflectivity);
 	glUniform1f(shader::uniform(program_id, "shininess"), shininess);
 }

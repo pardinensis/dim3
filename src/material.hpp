@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 #include <map>
-#include <GL/glew.h>
 
 class Material {
 

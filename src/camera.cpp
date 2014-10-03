@@ -30,9 +30,15 @@ void Camera::set_orthographic_projection(float left, float right,
 
 
 
-void Camera::upload_matrices(GLuint view_loc, GLuint proj_loc) {
+void Camera::upload_camera_matrices(GLuint view_loc, GLuint proj_loc) {
 	glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj_matrix));
+}
+
+void Camera::upload_object_matrices(const glm::mat4& model_matrix, GLuint model_loc, GLuint normal_loc) {
+	glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model_matrix * view_matrix)));
+	glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model_matrix));
+	glUniformMatrix3fv(normal_loc, 1, GL_FALSE, glm::value_ptr(normal_matrix));
 }
 
 void Camera::get_view(glm::mat4& view) {

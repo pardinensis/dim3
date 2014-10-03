@@ -1,8 +1,10 @@
 #include "file_utils.hpp"
 #include "renderer.hpp"
 #include "texture.hpp"
+#include "light.hpp"
 #include "phong_material.hpp"
 #include "common.hpp"
+#include "gl_utils.hpp"
 
 
 SDL_Window* window = nullptr;
@@ -54,66 +56,24 @@ void init() {
 	cam->set_perspective_projection(45, ((float)size_x)/size_y, 0.1, 100);
 	renderer->set_camera("cam");
 
-	// create shader
-	//shader::create("test", "shader/vs.glsl", GL_VERTEX_SHADER);
-	//shader::create("test", "shader/fs.glsl", GL_FRAGMENT_SHADER);
-
-	// create texture
-	//texture::create("orange", "media/dev.jpg");
-
-	Material* blue = new PhongMaterial(glm::vec3(0, 0, 0.2), glm::vec3(0.2, 0.2, 1),
-			glm::vec3(1, 1, 1), 5);
+	// create material
+	Material* blue = new PhongMaterial(glm::vec3(1, 1, 1), 0.1, 5);
 	add_material("blue", blue);
+
+	// create light
+	add_light(create_pointlight(glm::vec3(2, -4, 3), 4, glm::vec3(1, 0.7, 0.5)));
+	add_light(create_pointlight(glm::vec3(-3, 2, 1), 3, glm::vec3(0.2, 0.2, 0.9)));
 
 	// test cube
 	RenderObject* test = create_render_object("test");
-	std::vector<glm::vec3> pos = {
-		glm::vec3(-1,  1, -1),
-		glm::vec3( 1,  1, -1),
-		glm::vec3(-1, -1, -1),
-		glm::vec3( 1, -1, -1),
-		glm::vec3(-1,  1,  1),
-		glm::vec3( 1,  1,  1),
-		glm::vec3(-1, -1,  1),
-		glm::vec3( 1, -1,  1)
-	};
-	std::vector<glm::vec2> tc = {
-		glm::vec2(0, 1),
-		glm::vec2(0, 1),
-		glm::vec2(1, 0),
-		glm::vec2(1, 1),
-		glm::vec2(1, 1),
-		glm::vec2(1, 0),
-		glm::vec2(0, 1),
-		glm::vec2(0, 0)
-	};
-	std::vector<glm::vec3> col = {
-		glm::vec3(0, 0, 0),
-		glm::vec3(0, 0, 1),
-		glm::vec3(0, 1, 0),
-		glm::vec3(0, 1, 1),
-		glm::vec3(1, 0, 0),
-		glm::vec3(1, 0, 1),
-		glm::vec3(1, 1, 0),
-		glm::vec3(1, 1, 1)
-	};
-	std::vector<glm::uvec3> idx = {
-		glm::uvec3(0, 1, 2), //front
-		glm::uvec3(2, 1, 3),
-		glm::uvec3(5, 4, 7), //back
-		glm::uvec3(7, 4, 6),
-		glm::uvec3(1, 5, 3), //right
-		glm::uvec3(3, 5, 7),
-		glm::uvec3(4, 0, 6), //left
-		glm::uvec3(6, 0, 2),
-		glm::uvec3(4, 5, 0), //top
-		glm::uvec3(0, 5, 1),
-		glm::uvec3(2, 3, 6), //bottom
-		glm::uvec3(6, 3, 7)
-	};
+	std::vector<glm::vec3> pos;
+	std::vector<glm::vec3> norm;
+	std::vector<glm::uvec3> idx;
+	create_cube_vertex_buffer(pos);
+	create_cube_index_buffer(idx);
+	calculate_vertex_normals(pos, idx, norm);
 	test->add_vertex_buffer(RenderObject::BufferType::POS, pos, 0);
-	//test->add_vertex_buffer(RenderObject::BufferType::TC, tc, 1);
-	//test->add_vertex_buffer(RenderObject::BufferType::COLOR, col, 2);
+	test->add_vertex_buffer(RenderObject::BufferType::NORM, norm, 1);
 	test->add_index_buffer(idx);
 	test->set_material("blue");
 	renderer->register_render_object(test);

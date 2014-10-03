@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.hpp"
-#include <GL/glew.h>
 
 class Camera {
 
@@ -19,7 +18,9 @@ public:
 			float near, float far);
 
 
-	void upload_matrices(GLuint view_loc, GLuint proj_loc);
+	void upload_camera_matrices(GLuint view_loc, GLuint proj_loc);
+	void upload_object_matrices(const glm::mat4& model_matrix, GLuint model_loc, GLuint normal_loc);
+
 
 	void get_view(glm::mat4& view);
 	void get_proj(glm::mat4& proj);

@@ -30,3 +30,18 @@ void check_sdl_error(int error_code, const std::string& func_name) {
 		throw ss.str();
 	}
 }
+
+std::ostream& operator<<(std::ostream& stream, const glm::vec2& vec) {
+	stream << "(" << vec.x << ", " << vec.y << ")";
+	return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, const glm::vec3& vec) {
+	stream << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+	return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, const glm::vec4& vec) {
+	stream << "(" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << ")";
+	return stream;
+}
