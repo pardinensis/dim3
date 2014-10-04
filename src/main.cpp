@@ -3,6 +3,7 @@
 #include "texture.hpp"
 #include "light.hpp"
 #include "phong_material.hpp"
+#include "normals_material.hpp"
 #include "common.hpp"
 #include "gl_utils.hpp"
 
@@ -59,9 +60,11 @@ void init() {
 	// create material
 	Material* blue = new PhongMaterial(glm::vec3(1, 1, 1), 0.1, 5);
 	add_material("blue", blue);
+	Material* normals = new NormalsMaterial();
+	add_material("normals", normals);
 
 	// create light
-	add_light(create_pointlight(glm::vec3(2, -4, 3), 4, glm::vec3(1, 0.7, 0.5)));
+	//add_light(create_pointlight(glm::vec3(5, 0, 3), 2, glm::vec3(0.2, 0.9, 0.2)));
 	add_light(create_pointlight(glm::vec3(-3, 2, 1), 3, glm::vec3(0.2, 0.2, 0.9)));
 
 	// test cube
@@ -71,12 +74,24 @@ void init() {
 	std::vector<glm::uvec3> idx;
 	create_cube_vertex_buffer(pos);
 	create_cube_index_buffer(idx);
-	calculate_vertex_normals(pos, idx, norm);
+	convert_to_triangle_soup(pos, idx);
+	calculate_vertex_normals_by_angle(pos, idx, norm);
 	test->add_vertex_buffer(RenderObject::BufferType::POS, pos, 0);
 	test->add_vertex_buffer(RenderObject::BufferType::NORM, norm, 1);
 	test->add_index_buffer(idx);
 	test->set_material("blue");
 	renderer->register_render_object(test);
+
+	// test plane
+	RenderObject* plane = create_render_object("plane");
+	create_plane_vertex_buffer(pos, 4, -2);
+	create_plane_index_buffer(idx);
+	calculate_vertex_normals_by_angle(pos, idx, norm);
+	plane->add_vertex_buffer(RenderObject::BufferType::POS, pos, 0);
+	plane->add_vertex_buffer(RenderObject::BufferType::NORM, norm, 1);
+	plane->add_index_buffer(idx);
+	plane->set_material("blue");
+	renderer->register_render_object(plane);
 
 
 	// make the window visible

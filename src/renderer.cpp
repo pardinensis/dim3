@@ -63,7 +63,7 @@ void Renderer::set_camera(const std::string& name) {
 
 void Renderer::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	Camera* cam = Camera::get(camera);
 	
 	for (auto pair : renderables) {
