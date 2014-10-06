@@ -1,5 +1,7 @@
 #include "file_utils.hpp"
 
+#include "buildconfig.h"
+
 #include <map>
 #include <fstream>
 #include <iostream>
@@ -8,8 +10,10 @@
 std::map<std::string, std::string> config_map;
 
 void parse_config_file(const std::string& filename) {
+	std::string filepath = std::string(CONF_ROOT) + "/" + filename;
+
 	std::fstream fs;
-	fs.open(filename, std::fstream::in);
+	fs.open(filepath, std::fstream::in);
 	if (!fs.is_open()) {
 		throw "could not open file: " + filename;
 	}

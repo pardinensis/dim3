@@ -1,5 +1,7 @@
 #include "shader.hpp"
 
+#include "buildconfig.h"
+
 #include <vector>
 #include <map>
 #include <iostream>
@@ -49,8 +51,11 @@ void insert(GLuint shader, const std::string& name) {
  }
 
 void shader::create(const std::string& name, const std::string& filename, GLuint type) {
+	// retrieve the full file path
+	std::string filepath = std::string(CONF_ROOT) + "/" + filename;
+
 	// get the shader code in a char[] format
-	std::ifstream ifs ((filename.c_str()));
+	std::ifstream ifs ((filepath.c_str()));
 	std::string str ((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 	const GLchar* source = static_cast<const GLchar*>(str.c_str());
 
