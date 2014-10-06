@@ -9,6 +9,7 @@
 Camera::Camera() {
 	view_matrix = glm::mat4(1.0);
 	proj_matrix = glm::mat4(1.0);
+	pos = glm::vec3(1, 0, 0);
 }
 
 Camera::~Camera() {}
@@ -16,6 +17,9 @@ Camera::~Camera() {}
 
 
 void Camera::set_lookat(glm::vec3& pos, glm::vec3& center, glm::vec3& up) {
+	this->pos = pos;
+	this->center = center;
+	this->up = up;
 	view_matrix = glm::lookAt(pos, center, up);
 }
 
@@ -39,6 +43,10 @@ void Camera::upload_object_matrices(const glm::mat4& model_matrix, GLuint model_
 	glm::mat3 normal_matrix = glm::transpose(glm::inverse(glm::mat3(model_matrix * view_matrix)));
 	glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model_matrix));
 	glUniformMatrix3fv(normal_loc, 1, GL_FALSE, glm::value_ptr(normal_matrix));
+}
+
+void Camera::upload_camera_world_pos(GLuint campos_loc) {
+	glUniform3fv(campos_loc, 1, glm::value_ptr(pos));
 }
 
 void Camera::get_view(glm::mat4& view) {

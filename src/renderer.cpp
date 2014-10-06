@@ -77,9 +77,11 @@ void Renderer::render() {
 		GLuint normal_loc = shader::uniform(program_id, "normal_matrix");
 		GLuint view_loc = shader::uniform(program_id, "view_matrix");
 		GLuint proj_loc = shader::uniform(program_id, "proj_matrix");
+		GLuint campos_loc = shader::uniform(program_id, "cam_wpos");
 
 		// pass camera matrices
 		cam->upload_camera_matrices(view_loc, proj_loc);
+		cam->upload_camera_world_pos(campos_loc);
 
 		// pass light information
 		bind_lights_to_shader(program_id);

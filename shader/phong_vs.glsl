@@ -9,15 +9,15 @@ uniform mat4 view_matrix;
 uniform mat4 proj_matrix;
 
 out vec3 var_wpos;
-out vec3 var_wnorm;
+out vec3 var_wnorm; 
 
 void main() {
-	// positions
 	vec4 wpos = model_matrix * vec4(in_pos, 1);
-	vec4 epos = proj_matrix * view_matrix * wpos;
-	gl_Position = epos;
-	var_wpos = wpos.xyz;
+	vec4 epos = view_matrix * wpos;
+	vec4 spos = proj_matrix * epos;
 
-	// normals
-	var_wnorm = normal_matrix * in_norm;
+	gl_Position = spos;
+
+	var_wpos = wpos.xyz;
+	var_wnorm = in_norm;
 }

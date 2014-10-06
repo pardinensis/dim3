@@ -50,7 +50,7 @@ void init() {
 
 	// create camera
 	Camera* cam = Camera::create("cam");
-	glm::vec3 cam_pos = glm::vec3(3.0, 2.0, 3.0);
+	glm::vec3 cam_pos = glm::vec3(6.0, 6.0, 6.0);
 	glm::vec3 cam_center = glm::vec3(0.0, 0.0, 0.0);
 	glm::vec3 cam_up = glm::vec3(0.0, 1.0, 0.0);
 	cam->set_lookat(cam_pos, cam_center, cam_up);
@@ -58,14 +58,14 @@ void init() {
 	renderer->set_camera("cam");
 
 	// create material
-	Material* blue = new PhongMaterial(glm::vec3(1, 1, 1), 0.1, 5);
+	Material* blue = new PhongMaterial(glm::vec3(0.7, 0.9, 0.9), 0.6, 20);
 	add_material("blue", blue);
 	Material* normals = new NormalsMaterial();
 	add_material("normals", normals);
 
 	// create light
-	//add_light(create_pointlight(glm::vec3(5, 0, 3), 2, glm::vec3(0.2, 0.9, 0.2)));
-	add_light(create_pointlight(glm::vec3(-3, 2, 1), 3, glm::vec3(0.2, 0.2, 0.9)));
+	add_light(create_pointlight(glm::vec3(5, 0, 3), 2, glm::vec4(0.9, 0.9, 0.9, 1)));
+	add_light(create_pointlight(glm::vec3(-2, 3, 1), 3, glm::vec4(0.9, 0.9, 0.9, 1)));
 
 	// test cube
 	RenderObject* test = create_render_object("test");
@@ -84,7 +84,7 @@ void init() {
 
 	// test plane
 	RenderObject* plane = create_render_object("plane");
-	create_plane_vertex_buffer(pos, 4, -2);
+	create_plane_vertex_buffer(pos, 5, -1.5);
 	create_plane_index_buffer(idx);
 	calculate_vertex_normals_by_angle(pos, idx, norm);
 	plane->add_vertex_buffer(RenderObject::BufferType::POS, pos, 0);

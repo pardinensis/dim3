@@ -8,6 +8,10 @@ private:
 	glm::mat4 view_matrix;
 	glm::mat4 proj_matrix;
 
+	glm::vec3 pos;
+	glm::vec3 center;
+	glm::vec3 up;
+
 	Camera();
 	~Camera();
 
@@ -20,7 +24,7 @@ public:
 
 	void upload_camera_matrices(GLuint view_loc, GLuint proj_loc);
 	void upload_object_matrices(const glm::mat4& model_matrix, GLuint model_loc, GLuint normal_loc);
-
+	void upload_camera_world_pos(GLuint campos_loc);
 
 	void get_view(glm::mat4& view);
 	void get_proj(glm::mat4& proj);
