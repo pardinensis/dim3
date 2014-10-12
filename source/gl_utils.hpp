@@ -9,6 +9,7 @@ void create_cube_vertex_buffer(std::vector<glm::vec3>& v);
 void create_cube_index_buffer(std::vector<glm::uvec3>& v);
 
 void create_plane_vertex_buffer(std::vector<glm::vec3>& v, float size, float height);
+void create_plane_tc_buffer(std::vector<glm::vec2>& v);
 void create_plane_index_buffer(std::vector<glm::uvec3>& v);
 
 void convert_to_triangle_soup(std::vector<glm::vec3>& verts, std::vector<glm::uvec3>& tris);

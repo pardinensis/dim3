@@ -59,6 +59,15 @@ void create_plane_vertex_buffer(std::vector<glm::vec3>& v, float size, float hei
 	};
 }
 
+void create_plane_tc_buffer(std::vector<glm::vec2>& v) {
+	v = {
+		glm::vec2(0, 0),
+		glm::vec2(0, 1),
+		glm::vec2(1, 0),
+		glm::vec2(1, 1)
+	};
+}
+
 void create_plane_index_buffer(std::vector<glm::uvec3>& v) {
 	v = {
 		glm::uvec3(0, 1, 2),

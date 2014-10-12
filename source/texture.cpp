@@ -25,18 +25,19 @@ void texture::create(const std::string& name, const std::string& filename) {
 		return;
 	}
 	
-	SDL_Surface* img = IMG_Load(filename.c_str());
-	check_sdl_error(img, std::string("IMG_Load(") + filename);
+	std::string filepath = std::string(CONF_ROOT) + "/" + filename;
+	SDL_Surface* img = IMG_Load(filepath.c_str());
+	check_sdl_error(img, std::string("IMG_Load (") + filename +")");
 
 	GLuint tex_id;
 	glGenTextures(1, &tex_id);
-	glBindTexture(GL_TEXTURE_2D, tex_id);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w, img->h, 0, GL_RGB, GL_UNSIGNED_BYTE, img->pixels);
+	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w, img->h, 0, GL_RGB, GL_UNSIGNED_BYTE, img->pixels);
 
 	SDL_FreeSurface(img);
 

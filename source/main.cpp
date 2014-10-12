@@ -2,8 +2,7 @@
 #include "renderer.hpp"
 #include "texture.hpp"
 #include "light.hpp"
-#include "phong_material.hpp"
-#include "normals_material.hpp"
+#include "material.hpp"
 #include "common.hpp"
 #include "gl_utils.hpp"
 
@@ -50,22 +49,26 @@ void init() {
 
 	// create camera
 	Camera* cam = Camera::create("cam");
-	glm::vec3 cam_pos = glm::vec3(6.0, 6.0, 6.0);
+	glm::vec3 cam_pos = glm::vec3(4.0, 5.0, 6.0);
 	glm::vec3 cam_center = glm::vec3(0.0, 0.0, 0.0);
 	glm::vec3 cam_up = glm::vec3(0.0, 1.0, 0.0);
 	cam->set_lookat(cam_pos, cam_center, cam_up);
 	cam->set_perspective_projection(45, ((float)size_x)/size_y, 0.1, 100);
 	renderer->set_camera("cam");
 
+
 	// create material
-	Material* blue = new PhongMaterial(glm::vec3(0.7, 0.9, 0.9), 0.6, 20);
+	Material* blue = new PhongMaterial(glm::vec3(0.1, 0.2, 0.9), 0.6, 20);
 	add_material("blue", blue);
+	Material* dev = new TexturedPhongMaterial("devtexture", 0.6, 20);
+	texture::create("devtexture", "media/dev.jpg");
+	add_material("dev", dev);
 	Material* normals = new NormalsMaterial();
 	add_material("normals", normals);
 
 	// create light
-	add_light(create_pointlight(glm::vec3(5, 0, 3), 2, glm::vec4(0.9, 0.9, 0.9, 1)));
-	add_light(create_pointlight(glm::vec3(-2, 3, 1), 3, glm::vec4(0.9, 0.9, 0.9, 1)));
+	add_light(create_pointlight(glm::vec3(5, 0, 3), 2, glm::vec4(0.9, 0.9, 0.9, 2)));
+	add_light(create_pointlight(glm::vec3(-2, 3, 1), 3, glm::vec4(0.9, 0.9, 0.9, 4)));
 
 	// test cube
 	RenderObject* test = create_render_object("test");
@@ -84,13 +87,16 @@ void init() {
 
 	// test plane
 	RenderObject* plane = create_render_object("plane");
+	std::vector<glm::vec2> tc;
 	create_plane_vertex_buffer(pos, 5, -1.5);
 	create_plane_index_buffer(idx);
+	create_plane_tc_buffer(tc);
 	calculate_vertex_normals_by_angle(pos, idx, norm);
 	plane->add_vertex_buffer(RenderObject::BufferType::POS, pos, 0);
 	plane->add_vertex_buffer(RenderObject::BufferType::NORM, norm, 1);
+	plane->add_vertex_buffer(RenderObject::BufferType::TC, tc, 2);
 	plane->add_index_buffer(idx);
-	plane->set_material("blue");
+	plane->set_material("dev");
 	renderer->register_render_object(plane);
 
 
@@ -98,17 +104,33 @@ void init() {
 	SDL_ShowWindow(window);
 }
 
+void process_keydown(const SDL_Keycode& keycode) {
+	switch (keycode) {
+		case SDLK_ESCAPE:
+			should_quit = true;
+			break;
+	}
+}
+
+void process_keyup(const SDL_Keycode& keycode) {
+
+}
+
 void process_events() {
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) {
 		switch(e.type) {
 			case SDL_QUIT:
-			case SDL_KEYDOWN:
 				should_quit = true;
+				break;
+			case SDL_KEYDOWN:
+				process_keydown(e.key.keysym.sym);
 				break;
 		}
 	}
 }
+
+
 
 void loop() {
 	process_events();

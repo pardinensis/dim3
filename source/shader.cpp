@@ -50,13 +50,43 @@ void insert(GLuint shader, const std::string& name) {
 	}
  }
 
-void shader::create(const std::string& name, const std::string& filename, GLuint type) {
-	// retrieve the full file path
-	std::string filepath = std::string(CONF_ROOT) + "/" + filename;
+void get_shader_code(const std::string& filename, std::string& out) {
+	out = std::string();
 
-	// get the shader code in a char[] format
-	std::ifstream ifs ((filepath.c_str()));
-	std::string str ((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+	std::string filepath = std::string(CONF_ROOT) + "/" + filename;
+	std::ifstream ifs(filepath.c_str());
+	if (ifs.fail()) {
+		std::cerr << "could not open shader file " << filename << std::endl;
+		return;
+	}
+
+	std::string line;
+	while (std::getline(ifs, line)) {
+		if (line.size() > 0 && line[0] == '#') {
+			size_t pos = line.find(' ');
+			if (pos != line.npos) {
+				std::string key = line.substr(1, pos - 1);
+				std::string val = line.substr(pos + 1);
+				if (key == "include") {
+					std::string included;
+					get_shader_code(val, included);
+					out += included;
+					continue;
+				}
+			}
+		}
+		out += line + '\n';
+	}
+
+	ifs.close();
+}
+
+void shader::create(const std::string& name, const std::string& filename, GLuint type) {
+	// read shader file
+	std::string str;
+	get_shader_code(filename, str);
+
+	// get the shader code in a GLchar[] format
 	const GLchar* source = static_cast<const GLchar*>(str.c_str());
 
 	//create shader object and compile code
@@ -68,6 +98,7 @@ void shader::create(const std::string& name, const std::string& filename, GLuint
 	GLint compiled = 0;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 	if (compiled == GL_FALSE) {
+		std::cerr << "failed compiling " << filename << std::endl;
 		print_log(shader);
 		exit(EXIT_FAILURE);
 	}
@@ -114,6 +145,7 @@ GLuint shader::use(const std::string& name) {
 		GLint is_linked = 0;
 		glGetProgramiv(p.id, GL_LINK_STATUS, (GLint *)&is_linked);
 		if (is_linked == GL_FALSE) {
+			std::cerr << "failed linking " << name << std::endl;
 			GLint max_len = 0;
 			glGetProgramiv(p.id, GL_INFO_LOG_LENGTH, &max_len);
 			std::vector<char> info_log(max_len);
